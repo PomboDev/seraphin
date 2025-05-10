@@ -48,7 +48,12 @@ local components = {
 	StateInitialized = world:component() :: Entity,
 
 	-- Character
+	Character = world:component() :: Entity<Model>,
 	Health = world:component() :: Entity<Health>,
 }
+
+for name, component in components do
+	world:set(component, Jecs.Name, name)
+end
 
 return table.freeze(components)

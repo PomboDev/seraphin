@@ -16,5 +16,6 @@ end
 
 addSystems(ReplicatedStorage.shared.systems)
 addSystems(ServerScriptService.server.systems)
+addSystems(ServerScriptService.server.systems.player)
 
 startup(systems)
