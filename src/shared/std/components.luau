@@ -52,7 +52,7 @@ local components = {
 	Health = world:component() :: Entity<Health>,
 }
 
-for name, component in components do
+for name, component in components :: { [string]: Entity } do
 	world:set(component, Jecs.Name, name)
 end
 
