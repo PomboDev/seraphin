@@ -1,0 +1,39 @@
+option ClientOutput = "../src/network/client.luau"
+option ServerOutput = "../src/network/server.luau"
+
+event requestFullPacket {
+	from: Client,
+	type: Reliable,
+	call: SingleAsync
+}
+
+event entityDeleted {
+	from: Server,
+	type: Reliable,
+	call: SingleAsync,
+	data: u16[]
+}
+
+type Entity = u16
+map EntityMap<T> = { [Entity]: T }
+enum SpecialChange = { __n, __d }
+struct ComponentPacket<T> {
+	value: EntityMap<T>,
+	special: EntityMap<SpecialChange>
+}
+
+event component {
+	from: Server,
+	type: Reliable,
+	call: SingleAsync,
+	data: (Entity, ComponentPacket<unknown>)
+}
+
+event componentTransform {
+	from: Server,
+	type: Reliable,
+	call: SingleAsync,
+	data: ComponentPacket<CFrame>
+}
+
+-- ... You'd have to make a new event to properly optimize replicating each component

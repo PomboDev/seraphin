@@ -1,0 +1,21 @@
+{
+    "languageMode": "strict",
+    "lint": {
+        "*": true
+    },
+    "lintErrors": false,
+    "typeErrors": true,
+    "globals": [
+        "warn"
+    ],
+    "aliases": {
+        "jecs": "../roblox_packages/jecs.luau",
+        "packages": "../roblox_packages",
+        "client": "../src/client",
+        "server": "../src/server",
+        "shared": "../src/shared",
+        "std": "../src/shared/std",
+        "world": "../src/shared/std/world.luau",
+        "components": "../src/shared/std/components.luau"
+    }
+}

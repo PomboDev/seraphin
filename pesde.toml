@@ -1,0 +1,38 @@
+name = "atm/seraphin"
+version = "0.1.0"
+description = "Roblox doom-titanfall-ultrakill-like game"
+authors = [
+    "Andrew Calderipe da Rosa",
+    "Tiffany Fukami Yamamoto",
+    "Ana Luisa Matos Leonel Assis",
+]
+
+[target]
+environment = "roblox"
+build_files = ["src"]
+
+[indices]
+default = "https://github.com/pesde-pkg/index"
+
+[wally_indices]
+default = "https://github.com/UpliftGames/wally-index"
+
+[scripts]
+roblox_sync_config_generator = ".pesde/scripts/roblox_sync_config_generator.luau"
+sourcemap_generator = ".pesde/scripts/sourcemap_generator.luau"
+
+[dev_dependencies]
+scripts = { name = "pesde/scripts_rojo", version = "^0.1.0", target = "lune" }
+rojo = { name = "pesde/rojo", version = "^7.5.1", target = "lune" }
+luau-lsp = { name = "pesde/luau_lsp", version = "^1.44.1", target = "lune" }
+stylua = { name = "pesde/stylua", version = "^2.1.0", target = "lune" }
+darklua = { name = "pesde/darklua", version = "^0.16.0", target = "lune" }
+selene = { name = "pesde/selene", version = "^0.28.0", target = "lune" }
+blink = { name = "pesde/blink", version = "^0.17.0", target = "lune" }
+
+[dependencies]
+jecs = { wally = "wally#ukendio/jecs", version = "^0.5.5" }
+jabby = { wally = "alicesaidhi/jabby", version = "^0.2.2" }
+planck = { wally = "yetanotherclown/planck", version = "^0.2.0-rc.1" }
+planck-jabby = { wally = "yetanotherclown/planck-jabby", version = "^0.2.0-rc.1" }
+planck-runservice = { wally = "yetanotherclown/planck-runservice", version = "^0.2.0-rc.1" }

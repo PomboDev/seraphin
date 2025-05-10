@@ -1,0 +1,25 @@
+{
+    "emitLegacyScripts": false,
+    "name": "jecs-game",
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedStorage": {
+            "$className": "ReplicatedStorage",
+            "packages": {
+                "$path": "roblox_packages"
+            },
+            "client": {
+                "$path": "src/client"
+            },
+            "shared": {
+                "$path": "src/shared"
+            }
+        },
+        "ServerScriptService": {
+            "$className": "ServerScriptService",
+            "server": {
+                "$path": "src/server"
+            }
+        }
+    }
+}
