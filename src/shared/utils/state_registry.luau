@@ -23,6 +23,7 @@ local function create_transition(groupId: string)
 	return function(world, entity, context, stateName)
 		local handler = get_handler(groupId)
 		if handler then
+			print(context, stateName)
 			handler(world, entity, context, stateName)
 		else
 			warn("No transition handler registered for state group: " .. groupId)

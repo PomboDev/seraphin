@@ -3,15 +3,31 @@ local world = require("@world")
 
 type noop = (...any) -> ()
 
-type Entity<T = unknown> = Jecs.Entity<T>
+type Id<T = any> = Jecs.Id<T>
 
-type State = {
-	on_enter: (world: Jecs.World, entity: Entity, context: any?) -> () | noop,
-	on_exit: (world: Jecs.World, entity: Entity, context: any?) -> () | noop,
-	update: (world: Jecs.World, entity: Entity, dt: number, context: any?) -> () | noop,
+export type CharacterController = ControllerManager & {
+	AirController: AirController,
+	GroundController: GroundController,
 }
 
-type StateGroup = {
+export type Character = Model & {
+	Humanoid: Humanoid,
+	HumanoidRootPart: Part,
+	ControllerManager: CharacterController,
+	Top: Part,
+	Visual: Part,
+	Bottom: Part & {
+		ControllerPartSensor: ControllerPartSensor,
+	},
+}
+
+export type State = {
+	on_enter: (world: Jecs.World, entity: Id, context: any?) -> () | noop,
+	on_exit: (world: Jecs.World, entity: Id, context: any?) -> () | noop,
+	update: (world: Jecs.World, entity: Id, dt: number, context: any?) -> () | noop,
+}
+
+export type StateGroup = {
 	[string]: State,
 }
 
@@ -38,21 +54,21 @@ export type TransitionQueue = {
 local components = {
 	-- [COMPONENTS]
 	-- Base
-	Name = world:component() :: Entity<string>,
-	Player = world:component() :: Entity<Player>,
-	LocalPlayer = world:component() :: Entity<Player>,
+	LocalPlayer = world:component() :: Id<Player>,
+	Player = world:component() :: Id<Player>,
+	Name = world:component() :: Id<string>,
 
 	-- State Machine Components
-	StateMachines = world:component() :: Entity<StateMachines>,
-	TransitionQueue = world:component() :: Entity<TransitionQueue>,
-	StateInitialized = world:component() :: Entity,
+	StateMachines = world:component() :: Id<StateMachines>,
+	TransitionQueue = world:component() :: Id<TransitionQueue>,
+	StateInitialized = Jecs.tag() :: Id,
 
 	-- Character
-	Character = world:component() :: Entity<Model>,
-	Health = world:component() :: Entity<Health>,
+	Character = (world:component() :: any) :: Id<Character>,
+	Health = world:component() :: Id<Health>,
 }
 
-for name, component in components :: { [string]: Entity } do
+for name, component in components :: { [string]: Id } do
 	world:set(component, Jecs.Name, name)
 end
 

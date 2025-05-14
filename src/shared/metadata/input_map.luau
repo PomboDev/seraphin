@@ -2,14 +2,18 @@ local input = require("@shared/utils/input_library")
 local action = input.action
 
 local input_map = {
-	move_delta = action({ Enum.KeyCode.Thumbstick2 }),
+	move_delta = action({
+		Enum.KeyCode.Thumbstick1,
+		Enum.KeyCode.W,
+		Enum.KeyCode.S,
+		Enum.KeyCode.A,
+		Enum.KeyCode.D,
+	}),
 
-	move_up = action({ Enum.KeyCode.W }),
-	move_down = action({ Enum.KeyCode.S }),
-	move_left = action({ Enum.KeyCode.A }),
-	move_right = action({ Enum.KeyCode.D }),
-
-	input_delta = action({ Enum.UserInputType.MouseMovement, Enum.KeyCode.Thumbstick1 }),
+	input_delta = action({ Enum.UserInputType.MouseMovement, Enum.KeyCode.Thumbstick2 }),
+	unlock_mouse = action({
+		Enum.KeyCode.C,
+	}),
 
 	crouch = action({ Enum.KeyCode.LeftControl, Enum.KeyCode.ButtonR3 }),
 	jump = action({ Enum.KeyCode.Space, Enum.KeyCode.ButtonX }),

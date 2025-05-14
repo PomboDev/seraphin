@@ -13,7 +13,7 @@ local Phases = PlanckRunService.Phases
 
 local function state_machine_system(world: Jecs.World)
 	for id, state_machines in world:query(components.StateMachines):without(components.StateInitialized) do
-		world:set(id, components.StateInitialized)
+		world:add(id, components.StateInitialized)
 
 		for states, state_machine in state_machines do
 			local state = states[state_machine.current]

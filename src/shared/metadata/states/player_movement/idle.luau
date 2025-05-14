@@ -5,19 +5,25 @@ local noop = require("@std/noop")
 local enum = require("@shared/metadata/states/player_movement/enum")
 local input_map = require("@shared/metadata/input_map")
 local state_registry = require("@shared/utils/state_registry")
+local types = require("@shared/metadata/states/player_movement/types")
 
 local movement_transition = state_registry.create_transition("player_movement")
 
 return table.freeze({
-	on_enter = function(world: Jecs.World, entity: Jecs.Entity, context: any?)
-		print("Idle state entered")
+	on_enter = function(_world: Jecs.World, _entity: Jecs.Entity, context: types.Context)
+		print("Idle", context)
+		local controller_manager = context.controller
+		controller_manager.ActiveController = controller_manager.GroundController
 	end,
 
 	on_exit = noop,
 
-	update = function(world: Jecs.World, entity: Jecs.Entity, dt: number, context: any?)
+	update = function(world: Jecs.World, entity: Jecs.Entity, dt: number, context: types.Context)
+		if input_map.move_delta:down() or context.humanoid.MoveDirection ~= Vector3.zero then
+			movement_transition(world, entity, context, enum.WALKING)
+		end
+
 		if input_map.jump:pressed() then
-			print("Transitioning to jump")
 			movement_transition(world, entity, context, enum.JUMPING)
 		end
 	end,

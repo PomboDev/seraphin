@@ -31,8 +31,8 @@ selene = { name = "pesde/selene", version = "^0.28.0", target = "lune" }
 blink = { name = "pesde/blink", version = "^0.17.0", target = "lune" }
 
 [dependencies]
-jecs = { wally = "wally#ukendio/jecs", version = "^0.5.5" }
-jabby = { wally = "alicesaidhi/jabby", version = "^0.2.2" }
+jecs = { wally = "wally#ukendio/jecs", version = "^0.6.0" }
+jabby = { wally = "alicesaidhi/jabby", version = "^0.2.3" }
 planck = { wally = "yetanotherclown/planck", version = "^0.2.0-rc.1" }
 planck-jabby = { wally = "yetanotherclown/planck-jabby", version = "^0.2.0-rc.1" }
 planck-runservice = { wally = "yetanotherclown/planck-runservice", version = "^0.2.0-rc.1" }

@@ -2,21 +2,9 @@ local Jecs = require("@jecs")
 local components = require("@components")
 local state_registry = require("@shared/utils/state_registry")
 
-export type StateDefinition = {
-	on_enter: (Jecs.World, Jecs.Entity, ...any) -> (),
-	on_exit: ((Jecs.World, Jecs.Entity, ...any) -> ())?,
-	update: ((Jecs.World, Jecs.Entity, number, ...any) -> ())?,
-}
-
-export type StateMachine = {
-	current: string,
-	previous: string?,
-	context: any?,
-}
-
-export type StateMachines = {
-	[any]: StateMachine,
-}
+export type StateDefinition = components.State
+export type StateMachine = components.StateMachine
+export type StateMachines = components.StateMachines
 
 local function get_state_machine(world: Jecs.World, entity: Jecs.Entity, state_group: any): StateMachine?
 	local state_machines = world:get(entity, components.StateMachines)
@@ -31,7 +19,8 @@ local function create_state_machine(
 	world: Jecs.World,
 	entity: Jecs.Entity,
 	state_group: any,
-	initial_state: string
+	initial_state: string,
+	initial_context: any?
 ): StateMachine
 	local state_machines = world:get(entity, components.StateMachines) or {}
 
@@ -39,7 +28,7 @@ local function create_state_machine(
 		state_machines[state_group] = {
 			current = initial_state,
 			previous = nil,
-			context = {},
+			context = initial_context or {},
 		}
 		world:set(entity, components.StateMachines, state_machines)
 	end
