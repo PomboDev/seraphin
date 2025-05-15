@@ -6,7 +6,9 @@ local STATES_ENUM = {
 	CROUCHING = "crouching",
 	SLIDING = "sliding",
 	DASHING = "dashing",
+	WALL_SLIDING = "wall_running",
 	WALL_RUNNING = "wall_running",
+	WALL_JUMPING = "wall_jumping",
 }
 
 return table.freeze(STATES_ENUM)

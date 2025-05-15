@@ -11,20 +11,24 @@ local movement_transition = state_registry.create_transition("player_movement")
 
 return table.freeze({
 	on_enter = function(_world: Jecs.World, _entity: Jecs.Entity, context: types.Context)
-		print("Idle", context)
 		local controller_manager = context.controller
 		controller_manager.ActiveController = controller_manager.GroundController
+		context.character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
 	end,
 
 	on_exit = noop,
 
-	update = function(world: Jecs.World, entity: Jecs.Entity, dt: number, context: types.Context)
-		if input_map.move_delta:down() or context.humanoid.MoveDirection ~= Vector3.zero then
+	update = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context)
+		if context.humanoid.MoveDirection ~= Vector3.zero then
 			movement_transition(world, entity, context, enum.WALKING)
 		end
 
 		if input_map.jump:pressed() then
 			movement_transition(world, entity, context, enum.JUMPING)
+		end
+
+		if context.ground_sensor.SensedPart == nil then
+			movement_transition(world, entity, context, enum.FALLING)
 		end
 	end,
 })

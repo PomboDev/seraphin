@@ -11,6 +11,11 @@ local input_map = {
 	}),
 
 	input_delta = action({ Enum.UserInputType.MouseMovement, Enum.KeyCode.Thumbstick2 }),
+	shoot = action({
+		Enum.UserInputType.MouseButton1,
+		Enum.UserInputType.Touch,
+		Enum.KeyCode.ButtonR2,
+	}),
 	unlock_mouse = action({
 		Enum.KeyCode.C,
 	}),

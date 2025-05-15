@@ -12,19 +12,19 @@ export type CharacterController = ControllerManager & {
 
 export type Character = Model & {
 	Humanoid: Humanoid,
-	HumanoidRootPart: Part,
+	HumanoidRootPart: Part & {
+		ControllerPartSensor: ControllerPartSensor,
+	},
 	ControllerManager: CharacterController,
 	Top: Part,
 	Visual: Part,
-	Bottom: Part & {
-		ControllerPartSensor: ControllerPartSensor,
-	},
+	Bottom: Part,
 }
 
 export type State = {
 	on_enter: (world: Jecs.World, entity: Id, context: any?) -> () | noop,
 	on_exit: (world: Jecs.World, entity: Id, context: any?) -> () | noop,
-	update: (world: Jecs.World, entity: Id, dt: number, context: any?) -> () | noop,
+	update: (world: Jecs.World, entity: Id, context: any?, dt: number) -> () | noop,
 }
 
 export type StateGroup = {

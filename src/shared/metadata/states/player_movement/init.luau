@@ -4,4 +4,5 @@ return table.freeze({
 	[STATES_ENUM.IDLE] = require(script.idle),
 	[STATES_ENUM.JUMPING] = require(script.jumping),
 	[STATES_ENUM.WALKING] = require(script.walking),
+	[STATES_ENUM.FALLING] = require(script.falling),
 })

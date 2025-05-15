@@ -7,7 +7,7 @@ export type Context = {
 	ground_sensor: ControllerPartSensor,
 
 	_jump_sustain_time: number,
-	_jump_sustain_active: boolean,
+	_jump_sustain_active: boolean?,
 }
 
 return nil

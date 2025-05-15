@@ -3,6 +3,7 @@ local PlanckRunService = require("@packages/planck-runservice")
 
 local components = require("@components")
 local Phases = PlanckRunService.Phases
+local camera = workspace.CurrentCamera
 
 local function update_controller(world: Jecs.World)
 	for _id, character in world:query(components.Character):with(components.LocalPlayer) do
@@ -11,11 +12,8 @@ local function update_controller(world: Jecs.World)
 
 		controller_manager.MovingDirection = direction
 
-		if direction.Magnitude > 0 then
-			controller_manager.FacingDirection = direction
-		else
-			controller_manager.FacingDirection = character.HumanoidRootPart.CFrame.LookVector
-		end
+		local cameraLookVector = camera.CFrame.LookVector
+		controller_manager.FacingDirection = Vector3.new(cameraLookVector.X, 0, cameraLookVector.Z).Unit
 	end
 end
 
