@@ -19,6 +19,14 @@ export type ShortInputType = {
 	destroy: () -> (),
 }
 
+export type Action = {
+	pressed: (self: any) -> boolean,
+	down: (self: any) -> boolean,
+	released: (self: any) -> boolean,
+	up: (self: any) -> boolean,
+	read: (self: any, deadzone: number | nil) -> Vector2,
+}
+
 local default_deadzone: number = 0.05
 
 local connections: { RBXScriptConnection } = {}
@@ -146,7 +154,7 @@ function controls(): { string }
 	return control_list
 end
 
-local function action(inputs: { Input })
+local function action(inputs: { Input }): Action
 	return {
 		pressed = function(): boolean
 			for _, key in inputs do
@@ -180,7 +188,7 @@ local function action(inputs: { Input })
 			end
 			return false
 		end,
-		read = function(deadzone): Vector2
+		read = function(_self, deadzone: number?): Vector2
 			for _, key in inputs do
 				local value = read_analog(key.Name, deadzone)
 				if value.Magnitude > 0 then
@@ -199,7 +207,7 @@ function destroy(): ()
 	connections = {}
 	states = {}
 	previous_states = {}
-	analog_values = {}
+	analog_values = {} :: InputStates<Vector2>
 end
 
 setup_connections()

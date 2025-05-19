@@ -5,22 +5,6 @@ type noop = (...any) -> ()
 
 type Id<T = any> = Jecs.Id<T>
 
-export type CharacterController = ControllerManager & {
-	AirController: AirController,
-	GroundController: GroundController,
-}
-
-export type Character = Model & {
-	Humanoid: Humanoid,
-	HumanoidRootPart: Part & {
-		ControllerPartSensor: ControllerPartSensor,
-	},
-	ControllerManager: CharacterController,
-	Top: Part,
-	Visual: Part,
-	Bottom: Part,
-}
-
 export type State = {
 	on_enter: (world: Jecs.World, entity: Id, context: any?) -> () | noop,
 	on_exit: (world: Jecs.World, entity: Id, context: any?) -> () | noop,
@@ -29,12 +13,6 @@ export type State = {
 
 export type StateGroup = {
 	[string]: State,
-}
-
-export type Health = {
-	value: number,
-	max_health: number,
-	regen: number,
 }
 
 export type StateMachine = {
@@ -51,12 +29,68 @@ export type TransitionQueue = {
 	[StateGroup]: string,
 }
 
+export type CharacterController = ControllerManager & {
+	AirController: AirController,
+	GroundController: GroundController,
+}
+
+export type Character = Model & {
+	Humanoid: Humanoid,
+	HumanoidRootPart: Part & {
+		GroundSensor: ControllerPartSensor,
+		ClimbSensor: ControllerPartSensor,
+	},
+	ControllerManager: CharacterController,
+	Top: Part,
+	Visual: Part,
+	Bottom: Part,
+}
+
+export type Health = {
+	value: number,
+	max_health: number,
+	regen: number,
+}
+
+export type Stamina = {
+	value: number,
+	max_health: number,
+	regen: number,
+}
+
+export type MovementAttributes = {
+	jump_force: number,
+	jump_cooldown: number,
+	coyote_time: number,
+	acceleration: number,
+	deceleration: number,
+	friction: number,
+	friction_weight: number,
+	speed: number,
+	turn_speed: number,
+	slope_angle: number,
+}
+
+export type MovementSensors = {
+	floor: ControllerPartSensor,
+	ladder: ControllerPartSensor,
+	water: BuoyancySensor,
+}
+
+export type MovementControllers = {
+	ground: GroundController,
+	air: AirController,
+	climb: ClimbController,
+	swim: SwimController,
+}
+
 local components = {
 	-- [COMPONENTS]
 	-- Base
-	LocalPlayer = world:component() :: Id<Player>,
-	Player = world:component() :: Id<Player>,
 	Name = world:component() :: Id<string>,
+	Camera = world:component() :: Id<Camera>,
+	Player = world:component() :: Id<Player>,
+	LocalPlayer = world:component() :: Id<Player>,
 
 	-- State Machine Components
 	StateMachines = world:component() :: Id<StateMachines>,
@@ -66,6 +100,7 @@ local components = {
 	-- Character
 	Character = (world:component() :: any) :: Id<Character>,
 	Health = world:component() :: Id<Health>,
+	Stamina = world:component() :: Id<Stamina>,
 }
 
 for name, component in components :: { [string]: Id } do

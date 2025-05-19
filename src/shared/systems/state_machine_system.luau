@@ -50,5 +50,5 @@ end
 
 return {
 	system = state_machine_system,
-	phase = Phases.PreSimulation,
+	phase = Phases.PreRender,
 }

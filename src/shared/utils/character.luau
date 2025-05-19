@@ -14,13 +14,15 @@ local function create_controller(character: Character)
 	controller_manager.BaseTurnSpeed = 100
 
 	local ground_controller = Instance.new("GroundController")
+	ground_controller.Name = "GroundController"
 	ground_controller.GroundOffset = 1
 	ground_controller.BalanceRigidityEnabled = true
 
 	local sliding_controller = Instance.new("GroundController")
+	sliding_controller.Name = "SlidingController"
 	sliding_controller.GroundOffset = 1
 	sliding_controller.Friction = 0.5
-	sliding_controller.FrictionWeight = 1
+	sliding_controller.FrictionWeight = 0.1
 	sliding_controller.BalanceRigidityEnabled = true
 
 	local air_controller = Instance.new("AirController")
@@ -30,14 +32,25 @@ local function create_controller(character: Character)
 	air_controller.MoveMaxForce = 175
 
 	local ground_sensor = Instance.new("ControllerPartSensor")
+	ground_sensor.Name = "GroundSensor"
 	ground_sensor.SensorMode = Enum.SensorMode.Floor
-	ground_sensor.SearchDistance = 1.5
+	ground_sensor.SearchDistance = 2.5
+
+	local climbing_sensor = Instance.new("ControllerPartSensor")
+	climbing_sensor.Name = "ClimbSensor"
+	climbing_sensor.SensorMode = Enum.SensorMode.Ladder
+	climbing_sensor.SearchDistance = 1.5
 
 	ground_sensor.Parent = character.HumanoidRootPart
+	climbing_sensor.Parent = character.HumanoidRootPart
+
 	controller_manager.GroundSensor = ground_sensor
+	controller_manager.ClimbSensor = climbing_sensor
 	controller_manager.Parent = character
-	ground_controller.Parent = controller_manager
+
 	air_controller.Parent = controller_manager
+	ground_controller.Parent = controller_manager
+	sliding_controller.Parent = controller_manager
 end
 
 return {

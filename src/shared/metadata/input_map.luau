@@ -4,9 +4,17 @@ local action = input.action
 local input_map = {
 	move_delta = action({
 		Enum.KeyCode.Thumbstick1,
+	}),
+	move_up = action({
 		Enum.KeyCode.W,
+	}),
+	move_down = action({
 		Enum.KeyCode.S,
+	}),
+	move_left = action({
 		Enum.KeyCode.A,
+	}),
+	move_right = action({
 		Enum.KeyCode.D,
 	}),
 

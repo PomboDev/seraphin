@@ -19,16 +19,27 @@ return table.freeze({
 	on_exit = noop,
 
 	update = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context)
+		local hit_part = context.ground_sensor.SensedPart
+		local hit_normal = context.ground_sensor.HitNormal
+
+		if hit_part and math.acos(hit_normal:Dot(Vector3.new(0, 1, 0))) >= math.rad(45) then
+			movement_transition(world, entity, context, enum.FALLING)
+			return
+		end
+
 		if context.humanoid.MoveDirection == Vector3.zero then
 			movement_transition(world, entity, context, enum.IDLE)
+			return
 		end
 
 		if input_map.jump:pressed() then
 			movement_transition(world, entity, context, enum.JUMPING)
+			return
 		end
 
 		if context.ground_sensor.SensedPart == nil then
 			movement_transition(world, entity, context, enum.FALLING)
+			return
 		end
 	end,
 })

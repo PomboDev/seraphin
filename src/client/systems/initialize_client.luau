@@ -22,10 +22,12 @@ local function initialize_client(world: Jecs.World)
 			world:set(components.LocalPlayer, components.Character, character)
 
 			state_machine_utils.create_state_machine(world, id, player_movement_states, player_movement_enum.IDLE, {
+				controller = character.ControllerManager,
 				character = character,
 				humanoid = character.Humanoid,
-				controller = character.ControllerManager,
-				ground_sensor = character.HumanoidRootPart.ControllerPartSensor,
+				root_part = character.HumanoidRootPart,
+				climb_sensor = character.HumanoidRootPart.ClimbSensor,
+				ground_sensor = character.HumanoidRootPart.GroundSensor,
 			})
 
 			state_machine_utils.create_state_machine(world, id, player_action_states, player_action_enum.IDLE, {

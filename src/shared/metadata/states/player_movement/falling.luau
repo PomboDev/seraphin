@@ -19,16 +19,24 @@ return table.freeze({
 	on_exit = noop,
 
 	update = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context)
-		local sensed_part = context.ground_sensor.SensedPart
-		local move_direction = context.humanoid.MoveDirection
+		local hit_part = context.ground_sensor.SensedPart
+		local hit_normal = context.ground_sensor.HitNormal
+		local move_direction = context.humanoid.MoveDirection.Magnitude
 
-		if sensed_part then
-			if move_direction == Vector3.zero then
+		if hit_part and math.acos(hit_normal:Dot(Vector3.new(0, 1, 0))) <= math.rad(45) then
+			if move_direction == 0 then
 				movement_transition(world, entity, context, enum.IDLE)
-				context.character.HumanoidRootPart.Velocity *= Vector3.new(1, 0, 1)
-			else
+				return
+			end
+
+			if input_map.jump:pressed() then
+				movement_transition(world, entity, context, enum.JUMPING)
+				return
+			end
+
+			if move_direction > 0 then
 				movement_transition(world, entity, context, enum.WALKING)
-				context.character.HumanoidRootPart.Velocity *= Vector3.new(1, 0, 1)
+				return
 			end
 		end
 	end,

@@ -56,7 +56,7 @@ local function debug_system(world: Jecs.World)
 		local velocity = character.HumanoidRootPart.AssemblyLinearVelocity
 		table.insert(debugInfo, `  Move Direction: {character.Humanoid.MoveDirection}`)
 		table.insert(debugInfo, `  Acceleration: {string.format("%.2f", velocity.Magnitude)}`)
-		table.insert(debugInfo, `  Is Grounded: {character.HumanoidRootPart.ControllerPartSensor.SensedPart ~= nil}`)
+		table.insert(debugInfo, `  Is Grounded: {character.HumanoidRootPart.GroundSensor.SensedPart ~= nil}`)
 		table.insert(debugInfo, `  Humanoid State: {character.Humanoid:GetState()}`)
 
 		table.insert(debugInfo, `[STATE MACHINES]`)
