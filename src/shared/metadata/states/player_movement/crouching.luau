@@ -14,7 +14,7 @@ return table.freeze({
 		local controller_manager = context.controller
 		controller_manager.ActiveController = controller_manager.GroundController
 		context.character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
-
+		-- Reset coyote and jump buffer timers
 		context.coyote_time = 0
 		context.jump_buffer = 0
 	end,
@@ -25,6 +25,7 @@ return table.freeze({
 		local hit_part = context.ground_sensor.SensedPart
 		local hit_normal = context.ground_sensor.HitNormal
 
+		-- Update timers
 		context.coyote_time = 0
 		if context.jump_buffer then
 			context.jump_buffer = math.max(0, context.jump_buffer - dt)

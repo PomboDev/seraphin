@@ -5,11 +5,11 @@ export type Context = {
 	root_part: BasePart,
 	character: components.Character,
 	controller: components.CharacterController,
-
 	climbing_sensor: ControllerPartSensor,
 	ground_sensor: ControllerPartSensor,
 
 	jump_force: number,
+	jump_buffer: number,
 	jump_cooldown: number,
 	coyote_time: number,
 

@@ -18,7 +18,7 @@ local input_map = {
 		Enum.KeyCode.D,
 	}),
 
-	input_delta = action({ Enum.UserInputType.MouseMovement, Enum.KeyCode.Thumbstick2 }),
+	input_delta = action({ Enum.UserInputType.MouseMovement }),
 	shoot = action({
 		Enum.UserInputType.MouseButton1,
 		Enum.UserInputType.Touch,

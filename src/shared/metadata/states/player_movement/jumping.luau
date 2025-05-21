@@ -26,11 +26,10 @@ return table.freeze({
 			root_part.AssemblyLinearVelocity = velocity_horizontal
 		end
 
-		if controller_manager.BaseMoveSpeed > 24 then
+		if math.floor(controller_manager.BaseMoveSpeed) > 24 then
 			local camForward = Vector3.new(camera.CFrame.LookVector.X, 0, camera.CFrame.LookVector.Z).Unit
 			local redirecting_impulse = camForward * velocity.Magnitude
 			root_part.AssemblyLinearVelocity = redirecting_impulse
-			print("Redirecting impulse: ", redirecting_impulse)
 		end
 
 		character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
@@ -39,6 +38,10 @@ return table.freeze({
 
 		context._jump_sustain_time = 0
 		context._jump_sustain_active = true
+
+		-- Reset coyote and jump buffer on jump
+		context.coyote_time = 0
+		context.jump_buffer = 0
 	end,
 
 	on_exit = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context)

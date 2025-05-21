@@ -18,10 +18,22 @@ return table.freeze({
 
 	on_exit = noop,
 
-	update = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context)
+	update = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context, dt: number)
 		local hit_part = context.ground_sensor.SensedPart
 		local hit_normal = context.ground_sensor.HitNormal
 		local move_direction = context.humanoid.MoveDirection.Magnitude
+
+		context.coyote_time = math.max(0, context.coyote_time - dt)
+		context.jump_buffer = math.max(0, context.jump_buffer - dt)
+
+		if input_map.jump:pressed() then
+			context.jump_buffer = 0.15
+		end
+
+		if context.coyote_time > 0 and context.jump_buffer > 0 then
+			movement_transition(world, entity, context, enum.JUMPING)
+			return
+		end
 
 		if hit_part and math.acos(hit_normal:Dot(Vector3.new(0, 1, 0))) <= math.rad(45) then
 			if move_direction == 0 then
@@ -29,7 +41,7 @@ return table.freeze({
 				return
 			end
 
-			if input_map.jump:pressed() then
+			if context.jump_buffer > 0 then
 				movement_transition(world, entity, context, enum.JUMPING)
 				return
 			end

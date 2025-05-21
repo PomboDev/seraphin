@@ -58,10 +58,7 @@ export type Stamina = {
 	regen: number,
 }
 
-export type MovementAttributes = {
-	jump_force: number,
-	jump_cooldown: number,
-	coyote_time: number,
+export type Movement = {
 	acceleration: number,
 	deceleration: number,
 	friction: number,
@@ -71,13 +68,20 @@ export type MovementAttributes = {
 	slope_angle: number,
 }
 
-export type MovementSensors = {
+export type Jump = {
+	jumps_remaining: number,
+	jump_force: number,
+	coyote_time: number,
+	jump_cooldown: number,
+}
+
+export type Sensors = {
 	floor: ControllerPartSensor,
 	ladder: ControllerPartSensor,
 	water: BuoyancySensor,
 }
 
-export type MovementControllers = {
+export type PhysicsControllers = {
 	ground: GroundController,
 	air: AirController,
 	climb: ClimbController,

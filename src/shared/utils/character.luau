@@ -11,7 +11,7 @@ local function create_controller(character: Character)
 	controller_manager.RootPart = character.HumanoidRootPart
 	controller_manager.FacingDirection = character.HumanoidRootPart.CFrame.LookVector
 	controller_manager.BaseMoveSpeed = 24
-	controller_manager.BaseTurnSpeed = 100
+	controller_manager.BaseTurnSpeed = 0
 
 	local ground_controller = Instance.new("GroundController")
 	ground_controller.Name = "GroundController"
