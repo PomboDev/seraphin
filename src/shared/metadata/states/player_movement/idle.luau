@@ -40,6 +40,11 @@ return table.freeze({
 			return
 		end
 
+		if input_map.crouch:pressed() then
+			movement_transition(world, entity, context, enum.CROUCHING)
+			return
+		end
+
 		if input_map.jump:pressed() then
 			movement_transition(world, entity, context, enum.JUMPING)
 			return

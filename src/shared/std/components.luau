@@ -32,6 +32,7 @@ export type TransitionQueue = {
 export type CharacterController = ControllerManager & {
 	AirController: AirController,
 	GroundController: GroundController,
+	SlidingController: GroundController,
 }
 
 export type Character = Model & {

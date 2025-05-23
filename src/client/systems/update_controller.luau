@@ -14,6 +14,9 @@ local Phases = PlanckRunService.Phases
 local grounded_accumulator = 0
 local base_speed = 24
 
+local slower_velocity_states = { "crouching", "aiming" }
+local override_velocity_states = { "idle", "walking", "sliding", "jumping", "falling" }
+
 local function update_controller(world: Jecs.World)
 	for id, player, camera in world:query(components.LocalPlayer, components.Camera):without(components.StateMachines) do
 		local character = (player.Character :: any) :: components.Character
@@ -42,6 +45,9 @@ local function update_controller(world: Jecs.World)
 	for _id, camera, character, state_machines in
 		world:query(components.Camera, components.Character, components.StateMachines)
 	do
+		local player_movement_state_machine = state_machines[player_movement_states :: any]
+		local player_action_state_machine = state_machines[player_action_states :: any]
+
 		local controller_manager = character.ControllerManager
 		local move_dir = character.Humanoid.MoveDirection
 		local root_part = character.HumanoidRootPart
@@ -49,17 +55,26 @@ local function update_controller(world: Jecs.World)
 		local cameraLookVector = camera.CFrame.LookVector
 		local camForward = Vector3.new(cameraLookVector.X, 0, cameraLookVector.Z).Unit
 
-		local override_speed = math.floor((root_part.AssemblyLinearVelocity * Vector3.new(1, 0, 1)).Magnitude)
-		if override_speed >= base_speed + 1 then
-			controller_manager.BaseMoveSpeed = override_speed
-			if controller_manager.ActiveController == controller_manager.GroundController then
-				grounded_accumulator += 0.025
-				controller_manager.BaseMoveSpeed =
-					math.max(controller_manager.BaseMoveSpeed * math.min(1 - grounded_accumulator, 0.1), base_speed)
-				root_part.AssemblyLinearVelocity *= math.min(1 - grounded_accumulator, 0.1)
+		if table.find(override_velocity_states, player_movement_state_machine.current) then
+			local override_speed = math.floor((root_part.AssemblyLinearVelocity * Vector3.new(1, 0, 1)).Magnitude)
+			if override_speed >= base_speed + 1 then
+				controller_manager.BaseMoveSpeed = override_speed
+				if controller_manager.ActiveController == controller_manager.GroundController then
+					grounded_accumulator += 0.025
+					controller_manager.BaseMoveSpeed =
+						math.max(controller_manager.BaseMoveSpeed * math.min(1 - grounded_accumulator, 0.1), base_speed)
+					root_part.AssemblyLinearVelocity *= math.min(1 - grounded_accumulator, 0.1)
+				else
+					grounded_accumulator = 0
+				end
 			else
-				grounded_accumulator = 0
+				controller_manager.BaseMoveSpeed = base_speed
 			end
+		elseif
+			table.find(slower_velocity_states, player_movement_state_machine.current)
+			or table.find(slower_velocity_states, player_action_state_machine.current)
+		then
+			controller_manager.BaseMoveSpeed = base_speed * 0.5
 		else
 			controller_manager.BaseMoveSpeed = base_speed
 		end

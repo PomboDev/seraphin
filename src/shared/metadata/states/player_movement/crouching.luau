@@ -14,7 +14,7 @@ return table.freeze({
 		local controller_manager = context.controller
 		controller_manager.ActiveController = controller_manager.GroundController
 		context.character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
-		-- Reset coyote and jump buffer timers
+
 		context.coyote_time = 0
 		context.jump_buffer = 0
 	end,
@@ -25,7 +25,6 @@ return table.freeze({
 		local hit_part = context.ground_sensor.SensedPart
 		local hit_normal = context.ground_sensor.HitNormal
 
-		-- Update timers
 		context.coyote_time = 0
 		if context.jump_buffer then
 			context.jump_buffer = math.max(0, context.jump_buffer - dt)
@@ -36,20 +35,20 @@ return table.freeze({
 			return
 		end
 
-		if context.humanoid.MoveDirection ~= Vector3.zero then
-			movement_transition(world, entity, context, enum.WALKING)
-			return
-		end
-
-		if input_map.jump:pressed() then
-			movement_transition(world, entity, context, enum.JUMPING)
-			return
-		end
-
 		if context.ground_sensor.SensedPart == nil then
 			context.coyote_time = 0.2
 			movement_transition(world, entity, context, enum.FALLING)
 			return
+		end
+
+		if input_map.crouch.down() == false then
+			if context.humanoid.MoveDirection ~= Vector3.zero then
+				movement_transition(world, entity, context, enum.WALKING)
+				return
+			else
+				movement_transition(world, entity, context, enum.IDLE)
+				return
+			end
 		end
 	end,
 })

@@ -40,8 +40,6 @@ local function state_machine_system(world: Jecs.World)
 
 	for id, state_machines in world:query(components.StateMachines) do
 		for states, state_machine in state_machines do
-			local _s, functions = next(states)
-			local str = debug.info(functions.update :: () -> nil, "s")
 			local dt = scheduler:getDeltaTime()
 			states[state_machine.current].update(world, id, state_machine.context, dt)
 		end

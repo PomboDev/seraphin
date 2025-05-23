@@ -39,7 +39,6 @@ return table.freeze({
 		context._jump_sustain_time = 0
 		context._jump_sustain_active = true
 
-		-- Reset coyote and jump buffer on jump
 		context.coyote_time = 0
 		context.jump_buffer = 0
 	end,

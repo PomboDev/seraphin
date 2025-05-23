@@ -21,8 +21,8 @@ local function create_controller(character: Character)
 	local sliding_controller = Instance.new("GroundController")
 	sliding_controller.Name = "SlidingController"
 	sliding_controller.GroundOffset = 1
-	sliding_controller.Friction = 0.5
-	sliding_controller.FrictionWeight = 0.1
+	sliding_controller.Friction = 0
+	sliding_controller.FrictionWeight = 0
 	sliding_controller.BalanceRigidityEnabled = true
 
 	local air_controller = Instance.new("AirController")

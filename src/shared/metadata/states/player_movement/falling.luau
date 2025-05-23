@@ -35,19 +35,29 @@ return table.freeze({
 			return
 		end
 
-		if hit_part and math.acos(hit_normal:Dot(Vector3.new(0, 1, 0))) <= math.rad(45) then
-			if move_direction == 0 then
-				movement_transition(world, entity, context, enum.IDLE)
-				return
+		if hit_part then
+			if math.acos(hit_normal:Dot(Vector3.new(0, 1, 0))) <= math.rad(45) then
+				if input_map.crouch:down() then
+					movement_transition(world, entity, context, enum.SLIDING)
+					return
+				end
+
+				if context.jump_buffer > 0 then
+					movement_transition(world, entity, context, enum.JUMPING)
+					return
+				end
+
+				if move_direction == 0 then
+					movement_transition(world, entity, context, enum.IDLE)
+					return
+				else
+					movement_transition(world, entity, context, enum.WALKING)
+					return
+				end
 			end
 
-			if context.jump_buffer > 0 then
-				movement_transition(world, entity, context, enum.JUMPING)
-				return
-			end
-
-			if move_direction > 0 then
-				movement_transition(world, entity, context, enum.WALKING)
+			if input_map.crouch:pressed() then
+				movement_transition(world, entity, context, enum.SLIDING)
 				return
 			end
 		end

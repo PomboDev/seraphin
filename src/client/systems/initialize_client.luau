@@ -8,7 +8,6 @@ local components = require("@components")
 
 local function initialize_client(world: Jecs.World)
 	local camera = workspace.CurrentCamera
-	camera.CameraType = Enum.CameraType.Custom
 	UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
 
 	world:set(components.LocalPlayer, components.LocalPlayer, Players.LocalPlayer)
