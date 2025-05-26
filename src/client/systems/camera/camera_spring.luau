@@ -1,6 +1,6 @@
 --!optimize 2
 --!native
---!nonstrict
+--!strict
 --draft 4
 
 local Jecs = require("@jecs")
@@ -32,7 +32,7 @@ end
 
 local halfLife = 0.5
 local frequency = 18
-local angularDisplacement = 1.5
+local angularDisplacement = 0.75
 local linearDisplacement = 0.0025
 
 local spring_position: Vector3

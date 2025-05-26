@@ -1,3 +1,8 @@
+--!optimize 2
+--!native
+--!strict
+--draft 4
+
 local UserInputService = game:GetService("UserInputService")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 
@@ -28,7 +33,7 @@ local function update_camera(world: Jecs.World)
 	do
 		local root_part = character.HumanoidRootPart
 
-		if input_map.unlock_mouse:pressed() then
+		if input_map.unlock_mouse:down() then
 			UserInputService.MouseBehavior = mouse_locked and Enum.MouseBehavior.LockCenter
 				or Enum.MouseBehavior.Default
 			mouse_locked = not mouse_locked

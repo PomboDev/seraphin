@@ -1,3 +1,8 @@
+--!optimize 2
+--!native
+--!strict
+--draft 4
+
 local Jecs = require("@jecs")
 local PlanckRunService = require("@packages/planck-runservice")
 local Phases = PlanckRunService.Phases
