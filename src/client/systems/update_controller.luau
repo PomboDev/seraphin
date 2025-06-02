@@ -27,18 +27,27 @@ local function update_controller(world: Jecs.World)
 		camera.CameraType = Enum.CameraType.Scriptable
 		world:set(id, components.Character, character)
 
-		state_machine_utils.create_state_machine(world, id, player_movement_states, player_movement_enum.IDLE, {
-			controller = character.ControllerManager,
-			character = character,
-			humanoid = character.Humanoid,
-			root_part = character.HumanoidRootPart,
-			climb_sensor = character.HumanoidRootPart.ClimbSensor,
-			ground_sensor = character.HumanoidRootPart.GroundSensor,
+		state_machine_utils.create_state_machine(world, id, player_movement_states, player_movement_enum.IDLE)
+
+		state_machine_utils.create_state_machine(world, id, player_action_states, player_action_enum.IDLE)
+
+		-- Initialize movement components
+		world:set(id, components.MovementTimers, {
+			coyote_time = 0,
+			jump_buffer = 0,
+			jump_cooldown = 0,
 		})
 
-		state_machine_utils.create_state_machine(world, id, player_action_states, player_action_enum.IDLE, {
-			camera = camera,
-			character = character,
+		world:set(id, components.JumpState, {
+			jumps_remaining = 1,
+			jump_force = 90,
+			sustain_time = 0,
+			sustain_active = false,
+		})
+
+		world:set(id, components.SlideState, {
+			timer = 0,
+			sliding = false,
 		})
 	end
 

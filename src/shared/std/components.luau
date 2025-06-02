@@ -6,9 +6,9 @@ type noop = (...any) -> ()
 type Id<T = any> = Jecs.Id<T>
 
 export type State = {
-	on_enter: (world: Jecs.World, entity: Id, context: any?) -> () | noop,
-	on_exit: (world: Jecs.World, entity: Id, context: any?) -> () | noop,
-	update: (world: Jecs.World, entity: Id, context: any?, dt: number) -> () | noop,
+	on_enter: (world: Jecs.World, entity: Id) -> () | noop,
+	on_exit: (world: Jecs.World, entity: Id) -> () | noop,
+	update: (world: Jecs.World, entity: Id, dt: number) -> () | noop,
 }
 
 export type StateGroup = {
@@ -18,7 +18,6 @@ export type StateGroup = {
 export type StateMachine = {
 	current: string,
 	previous: string?,
-	context: any?,
 }
 
 export type StateMachines = {
@@ -35,7 +34,7 @@ export type CharacterController = ControllerManager & {
 	SlidingController: GroundController,
 }
 
-export type Character = Model & {
+export type Character = {
 	Humanoid: Humanoid,
 	HumanoidRootPart: Part & {
 		GroundSensor: ControllerPartSensor,
@@ -89,6 +88,24 @@ export type PhysicsControllers = {
 	swim: SwimController,
 }
 
+export type MovementTimers = {
+	coyote_time: number,
+	jump_buffer: number,
+	jump_cooldown: number,
+}
+
+export type JumpState = {
+	jumps_remaining: number,
+	jump_force: number,
+	sustain_time: number,
+	sustain_active: boolean,
+}
+
+export type SlideState = {
+	timer: number,
+	sliding: boolean,
+}
+
 local components = {
 	-- [COMPONENTS]
 	-- Base
@@ -106,6 +123,13 @@ local components = {
 	Character = (world:component() :: any) :: Id<Character>,
 	Health = world:component() :: Id<Health>,
 	Stamina = world:component() :: Id<Stamina>,
+
+	-- Movement Components
+	Movement = world:component() :: Id<Movement>,
+	Jump = world:component() :: Id<Jump>,
+	MovementTimers = world:component() :: Id<MovementTimers>,
+	JumpState = world:component() :: Id<JumpState>,
+	SlideState = world:component() :: Id<SlideState>,
 }
 
 for name, component in components :: { [string]: Id } do

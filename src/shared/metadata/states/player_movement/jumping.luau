@@ -1,10 +1,7 @@
 local Jecs = require("@jecs")
-local _components = require("@components")
-local _noop = require("@std/noop")
+local components = require("@components")
 
 local enum = require("@shared/metadata/states/player_movement/enum")
-local types = require("@shared/metadata/states/player_movement/types")
-
 local input_map = require("@shared/metadata/input_map")
 local state_registry = require("@shared/utils/state_registry")
 local movement_transition = state_registry.create_transition("player_movement")
@@ -14,9 +11,15 @@ local SUSTAIN_TIME = 0.2
 local SUSTAIN_IMPULSE_SCALE = 0.5
 
 return table.freeze({
-	on_enter = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context)
-		local controller_manager = context.controller
-		local character = context.character
+	on_enter = function(world: Jecs.World, entity: Jecs.Entity)
+		local character = world:get(entity, components.Character)
+		local movement_timers = world:get(entity, components.MovementTimers)
+		local jump_state = world:get(entity, components.JumpState)
+		if character == nil or movement_timers == nil or not jump_state then
+			return
+		end
+
+		local controller_manager = character.ControllerManager
 		local root_part = character.HumanoidRootPart
 
 		local velocity = root_part.AssemblyLinearVelocity
@@ -33,31 +36,49 @@ return table.freeze({
 		end
 
 		character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-		root_part:ApplyImpulse(Vector3.new(0, 90, 0))
+		root_part:ApplyImpulse(Vector3.new(0, jump_state.jump_force, 0))
 		controller_manager.ActiveController = controller_manager.AirController
 
-		context._jump_sustain_time = 0
-		context._jump_sustain_active = true
+		jump_state.sustain_time = 0
+		jump_state.sustain_active = true
 
-		context.coyote_time = 0
-		context.jump_buffer = 0
+		movement_timers.coyote_time = 0
+		movement_timers.jump_buffer = 0
+
+		world:set(entity, components.JumpState, jump_state)
+		world:set(entity, components.MovementTimers, movement_timers)
 	end,
 
-	on_exit = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context)
-		context._jump_sustain_active = false
+	on_exit = function(world: Jecs.World, entity: Jecs.Entity)
+		local jump_state = world:get(entity, components.JumpState)
+		if not jump_state then
+			return
+		end
+
+		jump_state.sustain_active = false
+		world:set(entity, components.JumpState, jump_state)
 	end,
 
-	update = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context, dt: number)
-		if context._jump_sustain_active and context._jump_sustain_time < SUSTAIN_TIME then
+	update = function(world: Jecs.World, entity: Jecs.Entity, dt: number)
+		local character = world:get(entity, components.Character)
+		local jump_state = world:get(entity, components.JumpState)
+		if character == nil or not jump_state then
+			return
+		end
+
+		if jump_state.sustain_active and jump_state.sustain_time < SUSTAIN_TIME then
 			if input_map.jump:down() then
 				local sustainImpulse = Vector3.new(0, 200, 0) * SUSTAIN_IMPULSE_SCALE * dt / SUSTAIN_TIME
-				context.character.HumanoidRootPart:ApplyImpulse(sustainImpulse)
-				context._jump_sustain_time += dt
+				character.HumanoidRootPart:ApplyImpulse(sustainImpulse)
+				jump_state.sustain_time += dt
+				world:set(entity, components.JumpState, jump_state)
 			else
-				context._jump_sustain_active = false
+				local updated_jump_state = jump_state :: components.JumpState
+				updated_jump_state.sustain_active = false
+				world:set(entity, components.JumpState, updated_jump_state)
 			end
 		else
-			movement_transition(world, entity, context, enum.FALLING)
+			movement_transition(world, entity, enum.FALLING)
 			return
 		end
 	end,

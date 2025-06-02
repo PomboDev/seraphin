@@ -1,22 +1,26 @@
 local Jecs = require("@jecs")
-local _components = require("@components")
+local components = require("@components")
 local input_map = require(script.Parent.Parent.Parent.input_map)
-local noop = require("@std/noop")
 
 local state_registry = require("@shared/utils/state_registry")
 
 local enum = require("@shared/metadata/states/player_action/enum")
-local types = require("@shared/metadata/states/player_action/types")
 local action_transition = state_registry.create_transition("player_action")
 
 return table.freeze({
-	on_enter = function(_world: Jecs.World, _entity: Jecs.Entity, context: types.Context)
-		local lookVector = context.camera.CFrame.LookVector
-		local origin = context.camera.CFrame.Position
+	on_enter = function(world: Jecs.World, entity: Jecs.Entity)
+		local camera = world:get(entity, components.Camera)
+		local character = world:get(entity, components.Character)
+		if not camera or character == nil then
+			return
+		end
+
+		local lookVector = camera.CFrame.LookVector
+		local origin = camera.CFrame.Position
 		local target = origin + (lookVector * 100)
 
 		local raycastParams = RaycastParams.new()
-		raycastParams.FilterDescendantsInstances = { context.character :: any }
+		raycastParams.FilterDescendantsInstances = { character :: any }
 		raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 
 		local raycastResult = workspace:Raycast(origin, lookVector * 100, raycastParams)
@@ -33,11 +37,11 @@ return table.freeze({
 		game:GetService("Debris"):AddItem(debugLine, 1)
 	end,
 
-	on_exit = noop,
+	on_exit = function() end,
 
-	update = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context)
+	update = function(world: Jecs.World, entity: Jecs.Entity, _dt: number)
 		if input_map.shoot:released() then
-			action_transition(world, entity, context, enum.IDLE)
+			action_transition(world, entity, enum.IDLE)
 		end
 	end,
 })

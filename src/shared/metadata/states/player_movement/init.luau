@@ -1,4 +1,4 @@
-local STATES_ENUM = require("./enum")
+local STATES_ENUM = require("@shared/metadata/states/player_movement/enum")
 
 return table.freeze({
 	[STATES_ENUM.IDLE] = require(script.idle),

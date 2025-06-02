@@ -9,21 +9,21 @@ local function get_group(groupId: string): any?
 	return state_groups[groupId]
 end
 
-local function register_handler(groupId: string, handler: (any, any, any, string) -> ())
+local function register_handler(groupId: string, handler: (any, any, string) -> ())
 	registry[groupId] = {
 		transition = handler,
 	}
 end
 
-local function get_handler(groupId: string): ((any, any, any, string) -> ())?
+local function get_handler(groupId: string): ((any, any, string) -> ())?
 	return registry[groupId] and registry[groupId].transition
 end
 
 local function create_transition(groupId: string)
-	return function(world, entity, context, stateName)
+	return function(world, entity, stateName)
 		local handler = get_handler(groupId)
 		if handler then
-			handler(world, entity, context, stateName)
+			handler(world, entity, stateName)
 		else
 			warn("No transition handler registered for state group: " .. groupId)
 		end

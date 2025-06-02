@@ -1,59 +1,74 @@
 local Jecs = require("@jecs")
-local _components = require("@components")
+local components = require("@components")
 local noop = require("@std/noop")
 
 local enum = require("@shared/metadata/states/player_movement/enum")
 local input_map = require("@shared/metadata/input_map")
 local state_registry = require("@shared/utils/state_registry")
-local types = require("@shared/metadata/states/player_movement/types")
 
 local movement_transition = state_registry.create_transition("player_movement")
 
 return table.freeze({
-	on_enter = function(_world: Jecs.World, _entity: Jecs.Entity, context: types.Context)
-		local controller_manager = context.controller
-		controller_manager.ActiveController = controller_manager.GroundController
-		context.character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+	on_enter = function(world: Jecs.World, entity: Jecs.Entity)
+		local character = world:get(entity, components.Character)
+		if character == nil then
+			return
+		end
 
-		context.coyote_time = 0
-		context.jump_buffer = 0
+		local controller_manager = character.ControllerManager
+		controller_manager.ActiveController = controller_manager.GroundController
+		character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+
+		world:set(entity, components.MovementTimers, {
+			coyote_time = 0,
+			jump_buffer = 0,
+			jump_cooldown = 0,
+		})
 	end,
 
 	on_exit = noop,
 
-	update = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context, dt: number)
-		local hit_part = context.ground_sensor.SensedPart
-		local hit_normal = context.ground_sensor.HitNormal
-
-		context.coyote_time = 0
-		if context.jump_buffer then
-			context.jump_buffer = math.max(0, context.jump_buffer - dt)
-		end
-
-		if hit_part and math.acos(hit_normal:Dot(Vector3.new(0, 1, 0))) >= math.rad(45) then
-			movement_transition(world, entity, context, enum.FALLING)
+	update = function(world: Jecs.World, entity: Jecs.Entity, dt: number)
+		local character: components.Character = world:get(entity, components.Character) :: any
+		local movement_timers = world:get(entity, components.MovementTimers)
+		if character == nil or movement_timers == nil then
 			return
 		end
 
-		if context.humanoid.MoveDirection ~= Vector3.zero then
-			movement_transition(world, entity, context, enum.WALKING)
+		local hit_part = character.HumanoidRootPart.GroundSensor.SensedPart
+		local hit_normal = character.HumanoidRootPart.GroundSensor.HitNormal
+
+		movement_timers.coyote_time = 0
+		if movement_timers.jump_buffer > 0 then
+			movement_timers.jump_buffer = math.max(0, movement_timers.jump_buffer - dt)
+		end
+
+		if hit_part and hit_normal and math.acos(hit_normal:Dot(Vector3.new(0, 1, 0))) >= math.rad(45) then
+			movement_transition(world, entity, enum.FALLING)
+			return
+		end
+
+		if character.Humanoid.MoveDirection ~= Vector3.zero then
+			movement_transition(world, entity, enum.WALKING)
 			return
 		end
 
 		if input_map.crouch:pressed() then
-			movement_transition(world, entity, context, enum.CROUCHING)
+			movement_transition(world, entity, enum.CROUCHING)
 			return
 		end
 
 		if input_map.jump:pressed() then
-			movement_transition(world, entity, context, enum.JUMPING)
+			movement_transition(world, entity, enum.JUMPING)
 			return
 		end
 
-		if context.ground_sensor.SensedPart == nil then
-			context.coyote_time = 0.2
-			movement_transition(world, entity, context, enum.FALLING)
+		if character.HumanoidRootPart.GroundSensor.SensedPart == nil then
+			movement_timers.coyote_time = 0.2
+			movement_transition(world, entity, enum.FALLING)
 			return
 		end
+
+		world:set(entity, components.MovementTimers, movement_timers)
 	end,
 })

@@ -1,66 +1,83 @@
 local Jecs = require("@jecs")
-local _components = require("@components")
+local components = require("@components")
 local input_map = require(script.Parent.Parent.Parent.input_map)
-local noop = require("@std/noop")
 
 local enum = require("@shared/metadata/states/player_movement/enum")
 local state_registry = require("@shared/utils/state_registry")
-local types = require("@shared/metadata/states/player_movement/types")
 
 local SLIDE_BOOST = 32 -- initial speed boost
-local SLIDE_FRICTION = 48 -- higher = stops faster
 local SLIDE_MIN_SPEED = 4 -- below this, go to crouch
 
 local movement_transition = state_registry.create_transition("player_movement")
 
 return table.freeze({
-	on_enter = function(_world: Jecs.World, _entity: Jecs.Entity, context: types.Context)
-		local controller_manager = context.controller
-		local root_part = context.character.HumanoidRootPart
+	on_enter = function(world: Jecs.World, entity: Jecs.Entity)
+		local character = world:get(entity, components.Character)
+		local slide_state = world:get(entity, components.SlideState)
+		if character == nil or not slide_state then
+			return
+		end
+
+		local controller_manager = character.ControllerManager
+		local root_part = character.HumanoidRootPart
 
 		controller_manager.ActiveController = controller_manager.SlidingController
-		context.character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+		character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
 
-		local move_dir = context.humanoid.MoveDirection
+		local move_dir = character.Humanoid.MoveDirection
 		root_part:ApplyImpulse(move_dir * SLIDE_BOOST)
 
-		context._slide_timer = 0
-		context._sliding = true
+		slide_state.timer = 0
+		slide_state.sliding = true
+		world:set(entity, components.SlideState, slide_state)
 	end,
 
-	on_exit = function(_world, _entity, context)
-		context._sliding = false
+	on_exit = function(world: Jecs.World, entity: Jecs.Entity)
+		local slide_state = world:get(entity, components.SlideState)
+		if not slide_state then
+			return
+		end
+
+		slide_state.sliding = false
+		world:set(entity, components.SlideState, slide_state)
 	end,
 
-	update = function(world: Jecs.World, entity: Jecs.Entity, context: types.Context, dt: number)
-		local root_part = context.character.HumanoidRootPart
+	update = function(world: Jecs.World, entity: Jecs.Entity, dt: number)
+		local character = world:get(entity, components.Character)
+		local slide_state = world:get(entity, components.SlideState)
+		if character == nil or not slide_state then
+			return
+		end
+
+		local root_part = character.HumanoidRootPart
 		local velocity = root_part.AssemblyLinearVelocity
 		local speed = velocity.Magnitude
 
-		-- if speed > 0 then
-		-- 	local friction = math.min(SLIDE_FRICTION * dt, 1)
-		-- 	local new_horizontal = horizontal * (1 - friction)
-		-- 	root_part.AssemblyLinearVelocity = Vector3.new(new_horizontal.X, velocity.Y, new_horizontal.Z)
-		-- end
+		slide_state.timer += dt
 
-		if speed < SLIDE_MIN_SPEED or context.ground_sensor.SensedPart == nil and input_map.crouch:down() then
-			movement_transition(world, entity, context, enum.CROUCHING)
+		if
+			speed < SLIDE_MIN_SPEED
+			or character.HumanoidRootPart.GroundSensor.SensedPart == nil and input_map.crouch:down()
+		then
+			movement_transition(world, entity, enum.CROUCHING)
 			return
 		end
 
 		if input_map.jump:pressed() then
-			movement_transition(world, entity, context, enum.JUMPING)
+			movement_transition(world, entity, enum.JUMPING)
 			print("Slide Jump")
 			return
 		end
 
 		if input_map.crouch:released() then
-			if context.humanoid.MoveDirection ~= Vector3.zero then
-				movement_transition(world, entity, context, enum.WALKING)
+			if character.Humanoid.MoveDirection ~= Vector3.zero then
+				movement_transition(world, entity, enum.WALKING)
 			else
-				movement_transition(world, entity, context, enum.IDLE)
+				movement_transition(world, entity, enum.IDLE)
 			end
 			return
 		end
+
+		world:set(entity, components.SlideState, slide_state)
 	end,
 })
