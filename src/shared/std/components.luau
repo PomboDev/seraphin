@@ -61,7 +61,7 @@ export type Health = {
 
 export type Stamina = {
 	value: number,
-	max_health: number,
+	max_stamina: number,
 	regen: number,
 }
 
