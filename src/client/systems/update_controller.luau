@@ -19,7 +19,7 @@ local override_velocity_states = { "idle", "walking", "sliding", "jumping", "fal
 
 local function update_controller(world: Jecs.World)
 	for id, player, camera in world:query(components.LocalPlayer, components.Camera):without(components.StateMachines) do
-		local character = (player.Character :: any) :: components.Character
+		local character = (player.Character :: any) :: components.Character?
 		if character == nil then
 			continue
 		end

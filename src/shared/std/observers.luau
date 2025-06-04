@@ -26,8 +26,7 @@ local function observers_new(world, description)
 
 	local entity_index = world.entity_index :: any
 	local function emplaced(entity: jecs.Entity)
-		local r = jecs.entity_index_try_get_fast(
-			entity_index, entity :: any)
+		local r = jecs.entity_index_try_get_fast(entity_index, entity :: any)
 
 		if not r then
 			return
@@ -43,7 +42,7 @@ local function observers_new(world, description)
 	for _, term in terms do
 		world:added(term, emplaced)
 		world:changed(term, emplaced)
- 	end
+	end
 end
 
 local function monitors_new(world, description)
@@ -58,8 +57,7 @@ local function monitors_new(world, description)
 
 	local entity_index = world.entity_index :: any
 	local function emplaced(entity: jecs.Entity)
-		local r = jecs.entity_index_try_get_fast(
-			entity_index, entity :: any)
+		local r = jecs.entity_index_try_get_fast(entity_index, entity :: any)
 
 		if not r then
 			return
@@ -72,9 +70,8 @@ local function monitors_new(world, description)
 		end
 	end
 
-	local function removed(entity: jecs.Entity, component: jecs.Id)
-		local r = jecs.entity_index_try_get_fast(
-			entity_index, entity :: any)
+	local function removed(entity: jecs.Entity, _component: jecs.Id)
+		local r = jecs.entity_index_try_get_fast(entity_index, entity :: any)
 
 		if not r then
 			return
@@ -90,7 +87,7 @@ local function monitors_new(world, description)
 	for _, term in terms do
 		world:added(term, emplaced)
 		world:removed(term, removed)
- 	end
+	end
 end
 
 local function observers_add(world: jecs.World): PatchedWorld
@@ -98,10 +95,10 @@ local function observers_add(world: jecs.World): PatchedWorld
 		added = {},
 		emplaced = {},
 		removed = {},
-		deleted = {}
+		deleted = {},
 	}
 
-	world = world :: jecs.World & {[string]: any}
+	world = world :: jecs.World & { [string]: any }
 
 	world.added = function(_, component, fn)
 		local listeners = signals.added[component]

@@ -9,8 +9,12 @@ local function spawn_character_system(world: Jecs.World)
 	for id, player in world:query(components.Player):without(components.Character) do
 		if player.Character and player.Character.Parent ~= nil then
 			world:set(id, components.Character, player.Character)
+			world:set(id, components.Health, {
+				value = 100,
+				max_health = 100,
+				regen = 10,
+			})
 			character_utils.create_controller(player.Character :: any)
-			print("Character created for player: ", player)
 		end
 	end
 end

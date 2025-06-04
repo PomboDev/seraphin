@@ -1,6 +1,7 @@
 --!optimize 2
 --!native
 --!strict
+local RunService = game:GetService("RunService")
 --draft 4
 
 local Jecs = require("@jecs")
@@ -46,7 +47,28 @@ local function state_machine_system(world: Jecs.World)
 	end
 end
 
-return {
-	system = state_machine_system,
-	phase = Phases.PreRender,
-}
+local function timePassed(time: number)
+	local storedTime: number?
+
+	return function()
+		if storedTime == nil or os.clock() - storedTime >= time then
+			storedTime = os.clock()
+			return true
+		end
+
+		return false
+	end
+end
+
+if RunService:IsClient() then
+	return {
+		system = state_machine_system,
+		phase = Phases.PreRender,
+	}
+else
+	return {
+		system = state_machine_system,
+		phase = Phases.PostSimulation,
+		runCondition = timePassed(0.1),
+	}
+end

@@ -28,15 +28,22 @@ export type TransitionQueue = {
 	[StateGroup]: string,
 }
 
-export type CharacterController = ControllerManager & {
+export type CharacterController = {
 	AirController: AirController,
 	GroundController: GroundController,
 	SlidingController: GroundController,
+	BaseMoveSpeed: number,
+	MovingDirection: Vector3,
+	FacingDirection: Vector3,
+	ActiveController: GroundController | AirController | ClimbController | SwimController,
 }
 
 export type Character = {
 	Humanoid: Humanoid,
-	HumanoidRootPart: Part & {
+	HumanoidRootPart: {
+		AssemblyLinearVelocity: Vector3,
+		AssemblyAngularVelocity: Vector3,
+		CFrame: CFrame,
 		GroundSensor: ControllerPartSensor,
 		ClimbSensor: ControllerPartSensor,
 	},
@@ -56,6 +63,11 @@ export type Stamina = {
 	value: number,
 	max_health: number,
 	regen: number,
+}
+
+export type Animation = {
+	animations: { [string]: AnimationTrack },
+	animation_speed: number,
 }
 
 export type Movement = {
@@ -106,33 +118,76 @@ export type SlideState = {
 	sliding: boolean,
 }
 
-local components = {
-	-- [COMPONENTS]
-	-- Base
-	Name = world:component() :: Id<string>,
-	Camera = world:component() :: Id<Camera>,
-	Player = world:component() :: Id<Player>,
-	LocalPlayer = world:component() :: Id<Player>,
+export type Position = Vector3
 
-	-- State Machine Components
-	StateMachines = world:component() :: Id<StateMachines>,
-	TransitionQueue = world:component() :: Id<TransitionQueue>,
-	StateInitialized = Jecs.tag() :: Id,
+export type Rotation = Vector3
 
-	-- Character
-	Character = (world:component() :: any) :: Id<Character>,
-	Health = world:component() :: Id<Health>,
-	Stamina = world:component() :: Id<Stamina>,
+export type Voxel = {
+	front: Id,
+	back: Id,
+	left: Id,
+	right: Id,
+}
 
-	-- Movement Components
-	Movement = world:component() :: Id<Movement>,
-	Jump = world:component() :: Id<Jump>,
-	MovementTimers = world:component() :: Id<MovementTimers>,
-	JumpState = world:component() :: Id<JumpState>,
-	SlideState = world:component() :: Id<SlideState>,
+local components = {}
+
+-- [COMPONENTS]
+-- Network
+components.Networked = Jecs.tag() :: Id
+components.NetworkedPair = Jecs.tag() :: Id
+
+-- Base
+components.Camera = world:component() :: Id<Camera>
+components.Player = world:component() :: Id<Player>
+components.LocalPlayer = world:component() :: Id<Player>
+components.Position = world:component() :: Id<Position>
+components.Rotation = world:component() :: Id<Rotation>
+
+-- State Machine Components
+components.StateMachines = world:component() :: Id<StateMachines>
+components.TransitionQueue = world:component() :: Id<TransitionQueue>
+components.StateInitialized = Jecs.tag() :: Id
+
+-- Character
+components.Character = world:component() :: Id<Character>
+components.Health = world:component() :: Id<Health>
+components.Stamina = world:component() :: Id<Stamina>
+components.Animation = world:component() :: Id<Animation>
+
+-- Movement Components
+components.Movement = world:component() :: Id<Movement>
+components.Jump = world:component() :: Id<Jump>
+components.MovementTimers = world:component() :: Id<MovementTimers>
+components.JumpState = world:component() :: Id<JumpState>
+components.SlideState = world:component() :: Id<SlideState>
+
+-- Spatial Grid
+components.Voxel = world:component() :: Id<Voxel>
+
+-- Entities
+components.Npc = Jecs.component() :: Id<number>
+components.Friendly = Jecs.tag() :: Id
+components.Neutral = Jecs.tag() :: Id
+components.Hostile = Jecs.tag() :: Id
+
+local networked_components = {
+	"Name",
+	"Player",
+	"Position",
+	"Rotation",
+	"Health",
+	"Stamina",
+	"Npc",
+	"Friendly",
+	"Neutral",
+	"Hostile",
 }
 
 for name, component in components :: { [string]: Id } do
+	if table.find(networked_components, name) then
+		world:add(component, components.Networked)
+	end
+
 	world:set(component, Jecs.Name, name)
 end
 

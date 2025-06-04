@@ -2,19 +2,22 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
 local Jecs = require("@jecs")
-local Planck = require("@packages/planck")
+local PlanckRunService = require("@packages/planck-runservice")
 
 local components = require("@components")
+UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
 
 local function initialize_client(world: Jecs.World)
-	local camera = workspace.CurrentCamera
-	UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
-
-	world:set(components.LocalPlayer, components.LocalPlayer, Players.LocalPlayer)
-	world:set(components.LocalPlayer, components.Camera, camera)
+	for id, player in world:query(components.Player):without(components.LocalPlayer) do
+		if player == Players.LocalPlayer then
+			local camera = workspace.CurrentCamera
+			world:set(id, components.LocalPlayer, player)
+			world:set(id, components.Camera, camera)
+		end
+	end
 end
 
 return {
 	system = initialize_client,
-	phase = Planck.Phase.PreStartup,
+	phase = PlanckRunService.Phases.PostSimulation,
 }
