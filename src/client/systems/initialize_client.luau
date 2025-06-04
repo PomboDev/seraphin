@@ -1,20 +1,17 @@
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
 local Jecs = require("@jecs")
 local Planck = require("@packages/planck")
 
 local components = require("@components")
-local state_machine_utils = require("@shared/utils/state_machine_utils")
-
-local player_movement_enum = require("@shared/metadata/states/player_movement/enum")
-local player_movement_states = require("@shared/metadata/states/player_movement")
 
 local function initialize_client(world: Jecs.World)
-	world:set(components.LocalPlayer, components.LocalPlayer, Players.LocalPlayer)
+	local camera = workspace.CurrentCamera
+	UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
 
-	for id in world:query(components.LocalPlayer):without(components.StateMachines) do
-		state_machine_utils.create_state_machine(world, id, player_movement_states, player_movement_enum.IDLE)
-	end
+	world:set(components.LocalPlayer, components.LocalPlayer, Players.LocalPlayer)
+	world:set(components.LocalPlayer, components.Camera, camera)
 end
 
 return {

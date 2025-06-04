@@ -19,6 +19,14 @@ export type ShortInputType = {
 	destroy: () -> (),
 }
 
+export type Action = {
+	pressed: (self: any) -> boolean,
+	down: (self: any) -> boolean,
+	released: (self: any) -> boolean,
+	up: (self: any) -> boolean,
+	read: (self: any, deadzone: number | nil) -> Vector2,
+}
+
 local default_deadzone: number = 0.05
 
 local connections: { RBXScriptConnection } = {}
@@ -126,6 +134,42 @@ function enable(): ()
 	enabled = true
 end
 
+-- Reset analog values for mouse/controller if no movement detected (each frame)
+local function reset_analog_if_idle()
+	-- Mouse movement
+	if analog_values["MouseMovement"] and analog_values["MouseMovement"].Magnitude ~= 0 then
+		if
+			not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
+			and not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2)
+			and not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton3)
+		then
+			analog_values["MouseMovement"] = Vector2.zero
+		end
+	end
+	-- Thumbsticks
+	for _, key in { "Thumbstick1", "Thumbstick2" } do
+		if analog_values[key] and analog_values[key].Magnitude ~= 0 then
+			local found = false
+			for _, input in ipairs(UserInputService:GetGamepadState(Enum.UserInputType.Gamepad1)) do
+				if input.KeyCode.Name == key and input.Position.Magnitude > 0 then
+					found = true
+					break
+				end
+			end
+			if not found then
+				analog_values[key] = Vector2.zero
+			end
+		end
+	end
+end
+
+-- Patch update to also reset analog values
+local old_update = update
+function update()
+	old_update()
+	reset_analog_if_idle()
+end
+
 function update(): ()
 	previous_states = table.clone(states)
 end
@@ -146,7 +190,7 @@ function controls(): { string }
 	return control_list
 end
 
-local function action(inputs: { Input })
+local function action(inputs: { Input }): Action
 	return {
 		pressed = function(): boolean
 			for _, key in inputs do
@@ -180,7 +224,7 @@ local function action(inputs: { Input })
 			end
 			return false
 		end,
-		read = function(deadzone): Vector2
+		read = function(_self, deadzone: number?): Vector2
 			for _, key in inputs do
 				local value = read_analog(key.Name, deadzone)
 				if value.Magnitude > 0 then
@@ -199,7 +243,7 @@ function destroy(): ()
 	connections = {}
 	states = {}
 	previous_states = {}
-	analog_values = {}
+	analog_values = {} :: InputStates<Vector2>
 end
 
 setup_connections()

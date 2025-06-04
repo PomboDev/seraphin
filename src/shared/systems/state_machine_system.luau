@@ -13,11 +13,11 @@ local Phases = PlanckRunService.Phases
 
 local function state_machine_system(world: Jecs.World)
 	for id, state_machines in world:query(components.StateMachines):without(components.StateInitialized) do
-		world:set(id, components.StateInitialized)
+		world:add(id, components.StateInitialized)
 
 		for states, state_machine in state_machines do
 			local state = states[state_machine.current]
-			state.on_enter(world, id, state_machine.context)
+			state.on_enter(world, id)
 		end
 	end
 
@@ -30,24 +30,23 @@ local function state_machine_system(world: Jecs.World)
 			state_machine.previous = state_machine.current
 			state_machine.current = new_state
 
-			current_state.on_exit(world, id, state_machine.context)
-			next_state.on_enter(world, id, state_machine.context)
-
-			world:set(id, components.StateMachines, state_machines)
+			current_state.on_exit(world, id)
+			next_state.on_enter(world, id)
 		end
 
+		world:set(id, components.StateMachines, state_machines)
 		world:remove(id, components.TransitionQueue)
 	end
 
 	for id, state_machines in world:query(components.StateMachines) do
 		for states, state_machine in state_machines do
 			local dt = scheduler:getDeltaTime()
-			states[state_machine.current].update(world, id, dt, state_machine.context)
+			states[state_machine.current].update(world, id, dt)
 		end
 	end
 end
 
 return {
 	system = state_machine_system,
-	phase = Phases.PreSimulation,
+	phase = Phases.PreRender,
 }

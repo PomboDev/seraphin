@@ -2,21 +2,9 @@ local Jecs = require("@jecs")
 local components = require("@components")
 local state_registry = require("@shared/utils/state_registry")
 
-export type StateDefinition = {
-	on_enter: (Jecs.World, Jecs.Entity, ...any) -> (),
-	on_exit: ((Jecs.World, Jecs.Entity, ...any) -> ())?,
-	update: ((Jecs.World, Jecs.Entity, number, ...any) -> ())?,
-}
-
-export type StateMachine = {
-	current: string,
-	previous: string?,
-	context: any?,
-}
-
-export type StateMachines = {
-	[any]: StateMachine,
-}
+export type StateDefinition = components.State
+export type StateMachine = components.StateMachine
+export type StateMachines = components.StateMachines
 
 local function get_state_machine(world: Jecs.World, entity: Jecs.Entity, state_group: any): StateMachine?
 	local state_machines = world:get(entity, components.StateMachines)
@@ -39,7 +27,6 @@ local function create_state_machine(
 		state_machines[state_group] = {
 			current = initial_state,
 			previous = nil,
-			context = {},
 		}
 		world:set(entity, components.StateMachines, state_machines)
 	end
@@ -77,24 +64,9 @@ local function get_current_state(world: Jecs.World, entity: Jecs.Entity, state_g
 	return state_machine and state_machine.current
 end
 
-local function get_context(world: Jecs.World, entity: Jecs.Entity, state_group: any): any?
-	local state_machine = get_state_machine(world, entity, state_group)
-	return state_machine and state_machine.context
-end
-
-local function set_context(world: Jecs.World, entity: Jecs.Entity, state_group: any, context: any)
-	local state_machines = world:get(entity, components.StateMachines)
-	if not state_machines or not state_machines[state_group] then
-		return
-	end
-
-	state_machines[state_group].context = context
-	world:set(entity, components.StateMachines, state_machines)
-end
-
 local function register_state_group(state_group_id: string, state_group: any)
 	state_registry.register_group(state_group_id, state_group)
-	state_registry.register_handler(state_group_id, function(world, entity, context, new_state)
+	state_registry.register_handler(state_group_id, function(world, entity, new_state)
 		transition(world, entity, state_group, new_state)
 	end)
 end
@@ -105,7 +77,5 @@ return table.freeze({
 	transition = transition,
 	is_in_state = is_in_state,
 	get_current_state = get_current_state,
-	get_context = get_context,
-	set_context = set_context,
 	register_state_group = register_state_group,
 })

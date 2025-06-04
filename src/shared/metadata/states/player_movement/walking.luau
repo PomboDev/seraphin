@@ -29,7 +29,7 @@ return table.freeze({
 	on_exit = noop,
 
 	update = function(world: Jecs.World, entity: Jecs.Entity, dt: number)
-		local character: components.Character = world:get(entity, components.Character) :: any
+		local character = world:get(entity, components.Character)
 		local movement_timers = world:get(entity, components.MovementTimers)
 		if character == nil or movement_timers == nil then
 			return
@@ -48,13 +48,13 @@ return table.freeze({
 			return
 		end
 
-		if character.Humanoid.MoveDirection ~= Vector3.zero then
-			movement_transition(world, entity, enum.WALKING)
+		if character.Humanoid.MoveDirection == Vector3.zero then
+			movement_transition(world, entity, enum.IDLE)
 			return
 		end
 
 		if input_map.crouch:pressed() then
-			movement_transition(world, entity, enum.CROUCHING)
+			movement_transition(world, entity, enum.SLIDING)
 			return
 		end
 

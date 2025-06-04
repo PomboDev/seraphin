@@ -19,6 +19,7 @@ return table.freeze({
 		controller_manager.ActiveController = controller_manager.GroundController
 		character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
 
+		-- Reset movement timers
 		world:set(entity, components.MovementTimers, {
 			coyote_time = 0,
 			jump_buffer = 0,
@@ -29,7 +30,7 @@ return table.freeze({
 	on_exit = noop,
 
 	update = function(world: Jecs.World, entity: Jecs.Entity, dt: number)
-		local character: components.Character = world:get(entity, components.Character) :: any
+		local character = world:get(entity, components.Character)
 		local movement_timers = world:get(entity, components.MovementTimers)
 		if character == nil or movement_timers == nil then
 			return
@@ -48,25 +49,20 @@ return table.freeze({
 			return
 		end
 
-		if character.Humanoid.MoveDirection ~= Vector3.zero then
-			movement_transition(world, entity, enum.WALKING)
-			return
-		end
-
-		if input_map.crouch:pressed() then
-			movement_transition(world, entity, enum.CROUCHING)
-			return
-		end
-
-		if input_map.jump:pressed() then
-			movement_transition(world, entity, enum.JUMPING)
-			return
-		end
-
 		if character.HumanoidRootPart.GroundSensor.SensedPart == nil then
 			movement_timers.coyote_time = 0.2
 			movement_transition(world, entity, enum.FALLING)
 			return
+		end
+
+		if input_map.crouch:down() == false then
+			if character.Humanoid.MoveDirection ~= Vector3.zero then
+				movement_transition(world, entity, enum.WALKING)
+				return
+			else
+				movement_transition(world, entity, enum.IDLE)
+				return
+			end
 		end
 
 		world:set(entity, components.MovementTimers, movement_timers)
