@@ -177,9 +177,19 @@ local networked_components = {
 	"Hostile",
 }
 
+local networked_pairs = {
+	"Friendly",
+	"Neutral",
+	"Hostile",
+}
+
 for name, component in components :: { [string]: Id } do
 	if table.find(networked_components, name) then
 		world:add(component, components.Networked)
+	end
+
+	if table.find(networked_pairs, name) then
+		world:add(component, components.NetworkedPair)
 	end
 
 	world:set(component, Jecs.Name, name)
