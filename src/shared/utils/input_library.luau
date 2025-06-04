@@ -163,15 +163,9 @@ local function reset_analog_if_idle()
 	end
 end
 
--- Patch update to also reset analog values
-local old_update = update
 function update()
-	old_update()
-	reset_analog_if_idle()
-end
-
-function update(): ()
 	previous_states = table.clone(states)
+	reset_analog_if_idle()
 end
 
 function controls(): { string }
