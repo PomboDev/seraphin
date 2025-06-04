@@ -43,6 +43,7 @@ export type Character = {
 	HumanoidRootPart: {
 		AssemblyLinearVelocity: Vector3,
 		AssemblyAngularVelocity: Vector3,
+		Position: Vector3,
 		CFrame: CFrame,
 		GroundSensor: ControllerPartSensor,
 		ClimbSensor: ControllerPartSensor,
@@ -122,13 +123,6 @@ export type Position = Vector3
 
 export type Rotation = Vector3
 
-export type Voxel = {
-	front: Id,
-	back: Id,
-	left: Id,
-	right: Id,
-}
-
 local components = {}
 
 -- [COMPONENTS]
@@ -162,7 +156,7 @@ components.JumpState = world:component() :: Id<JumpState>
 components.SlideState = world:component() :: Id<SlideState>
 
 -- Spatial Grid
-components.Voxel = world:component() :: Id<Voxel>
+components.Voxel = Jecs.tag() :: Id
 
 -- Entities
 components.Npc = Jecs.component() :: Id<number>

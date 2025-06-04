@@ -5,7 +5,7 @@ local Phases = PlanckRunService.Phases
 local character_utils = require("@shared/utils/character")
 local components = require("@components")
 
-local function spawn_character_system(world: Jecs.World)
+local function character_system(world: Jecs.World)
 	for id, player in world:query(components.Player):without(components.Character) do
 		if player.Character and player.Character.Parent ~= nil then
 			world:set(id, components.Character, player.Character)
@@ -17,9 +17,13 @@ local function spawn_character_system(world: Jecs.World)
 			character_utils.create_controller(player.Character :: any)
 		end
 	end
+
+	for id, character in world:query(components.Character) do
+		world:set(id, components.Position, character.HumanoidRootPart.Position)
+	end
 end
 
 return {
-	system = spawn_character_system,
+	system = character_system,
 	phase = Phases.PostSimulation,
 }

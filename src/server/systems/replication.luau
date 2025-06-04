@@ -5,6 +5,7 @@ local PlanckRunService = require("@packages/planck-runservice")
 local Jecs = require("@jecs")
 local components = require("@components")
 local remotes = require("@std/remotes")
+local serdes = require("@shared/serdes")
 
 local onEvent = Planck.onEvent
 local _, collect = onEvent(Players, "PlayerAdded")
@@ -132,7 +133,14 @@ function create_replication_system()
 							set_values = table.create(entities_len, true)
 						else
 							local column = archetype.columns[archetype.records[component]]
-							table.move(column, 1, entities_len, set_n + 1, set_values)
+							-- Serialize values before sending
+							if serdes.needsSerialization(component) then
+								for i = 1, entities_len do
+									set_values[set_n + i] = serdes.serialize(component, column[i])
+								end
+							else
+								table.move(column, 1, entities_len, set_n + 1, set_values)
+							end
 						end
 
 						set_n += entities_len
@@ -162,7 +170,12 @@ function create_replication_system()
 				if v ~= "Jecs.Remove" then
 					set_n += 1
 					set_ids[set_n] = e
-					set_values[set_n] = v or true
+					-- Serialize the value before adding to set_values
+					if serdes.needsSerialization(component) and v ~= true then
+						set_values[set_n] = serdes.serialize(component, v)
+					else
+						set_values[set_n] = v or true
+					end
 				elseif not world:contains(e) then
 					removed_n += 1
 					removed_ids[removed_n] = e

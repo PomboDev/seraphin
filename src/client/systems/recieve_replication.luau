@@ -2,6 +2,7 @@ local Planck = require("@packages/planck")
 
 local Jecs = require("@jecs")
 local remotes = require("@std/remotes")
+local serdes = require("@shared/serdes")
 
 local onEvent = Planck.onEvent
 local event_fired, collect = onEvent(remotes.replication :: any, "OnClientEvent")
@@ -67,7 +68,11 @@ function reconcile(world: Jecs.World)
 					local values = map.values
 					for i, entity in set do
 						entity = ecs_map_get(world, entity)
-						world:set(entity, id, values[i])
+						local value = values[i]
+						if serdes.needsSerialization(id) then
+							value = serdes.deserialize(id, value)
+						end
+						world:set(entity, id, value)
 					end
 				end
 			end
