@@ -20,14 +20,6 @@ export type StateMachine = {
 	previous: string?,
 }
 
-export type StateMachines = {
-	[StateGroup]: StateMachine,
-}
-
-export type TransitionQueue = {
-	[StateGroup]: string,
-}
-
 export type CharacterController = {
 	AirController: AirController,
 	GroundController: GroundController,
@@ -38,6 +30,35 @@ export type CharacterController = {
 	ActiveController: GroundController | AirController | ClimbController | SwimController,
 }
 
+local components = {}
+
+-- [COMPONENTS]
+-- Network
+components.Networked = Jecs.tag() :: Id
+components.NetworkedPair = Jecs.tag() :: Id
+
+-- Base
+components.Camera = world:component() :: Id<Camera>
+components.Player = world:component() :: Id<Player>
+components.LocalPlayer = world:component() :: Id<Player>
+components.Name = world:component() :: Id<string>
+components.Position = world:component() :: Id<Vector3>
+components.Rotation = world:component() :: Id<Vector3>
+components.Velocity = world:component() :: Id<Vector3>
+
+-- State Machine Components
+export type StateMachines = {
+	[StateGroup]: StateMachine,
+}
+components.StateMachines = world:component() :: Id<StateMachines>
+
+export type TransitionQueue = {
+	[StateGroup]: string,
+}
+components.TransitionQueue = world:component() :: Id<TransitionQueue>
+components.StateInitialized = Jecs.tag() :: Id
+
+-- Character
 export type Character = {
 	Humanoid: Humanoid,
 	HumanoidRootPart: {
@@ -53,24 +74,24 @@ export type Character = {
 	Visual: Part,
 	Bottom: Part,
 }
+components.Character = world:component() :: Id<Character>
 
 export type Health = {
 	value: number,
 	max_health: number,
 	regen: number,
 }
+components.Health = world:component() :: Id<Health>
 
 export type Stamina = {
 	value: number,
 	max_stamina: number,
 	regen: number,
 }
+components.Stamina = world:component() :: Id<Stamina>
+components.Animation = world:component() :: Id
 
-export type Animation = {
-	animations: { [string]: AnimationTrack },
-	animation_speed: number,
-}
-
+-- Movement Components
 export type Movement = {
 	acceleration: number,
 	deceleration: number,
@@ -80,6 +101,7 @@ export type Movement = {
 	turn_speed: number,
 	slope_angle: number,
 }
+components.Movement = world:component() :: Id<Movement>
 
 export type Jump = {
 	jumps_remaining: number,
@@ -87,25 +109,14 @@ export type Jump = {
 	coyote_time: number,
 	jump_cooldown: number,
 }
-
-export type Sensors = {
-	floor: ControllerPartSensor,
-	ladder: ControllerPartSensor,
-	water: BuoyancySensor,
-}
-
-export type PhysicsControllers = {
-	ground: GroundController,
-	air: AirController,
-	climb: ClimbController,
-	swim: SwimController,
-}
+components.Jump = world:component() :: Id<Jump>
 
 export type MovementTimers = {
 	coyote_time: number,
 	jump_buffer: number,
 	jump_cooldown: number,
 }
+components.MovementTimers = world:component() :: Id<MovementTimers>
 
 export type JumpState = {
 	jumps_remaining: number,
@@ -113,46 +124,12 @@ export type JumpState = {
 	sustain_time: number,
 	sustain_active: boolean,
 }
+components.JumpState = world:component() :: Id<JumpState>
 
 export type SlideState = {
 	timer: number,
 	sliding: boolean,
 }
-
-export type Position = Vector3
-
-export type Rotation = Vector3
-
-local components = {}
-
--- [COMPONENTS]
--- Network
-components.Networked = Jecs.tag() :: Id
-components.NetworkedPair = Jecs.tag() :: Id
-
--- Base
-components.Camera = world:component() :: Id<Camera>
-components.Player = world:component() :: Id<Player>
-components.LocalPlayer = world:component() :: Id<Player>
-components.Position = world:component() :: Id<Position>
-components.Rotation = world:component() :: Id<Rotation>
-
--- State Machine Components
-components.StateMachines = world:component() :: Id<StateMachines>
-components.TransitionQueue = world:component() :: Id<TransitionQueue>
-components.StateInitialized = Jecs.tag() :: Id
-
--- Character
-components.Character = world:component() :: Id<Character>
-components.Health = world:component() :: Id<Health>
-components.Stamina = world:component() :: Id<Stamina>
-components.Animation = world:component() :: Id<Animation>
-
--- Movement Components
-components.Movement = world:component() :: Id<Movement>
-components.Jump = world:component() :: Id<Jump>
-components.MovementTimers = world:component() :: Id<MovementTimers>
-components.JumpState = world:component() :: Id<JumpState>
 components.SlideState = world:component() :: Id<SlideState>
 
 -- Spatial Grid
@@ -164,6 +141,45 @@ components.Friendly = Jecs.tag() :: Id
 components.Neutral = Jecs.tag() :: Id
 components.Hostile = Jecs.tag() :: Id
 
+-- Projectile System
+components.Weapon = world:component() :: Id<number>
+
+export type Ammo = {
+	value: number,
+	max_ammo: number,
+	reload_time: number,
+}
+components.Ammo = world:component() :: Id<Ammo>
+components.FireRate = world:component() :: Id<number>
+components.Damage = world:component() :: Id<number>
+components.Range = world:component() :: Id<number>
+
+components.ProjectileWeapon = Jecs.tag() :: Id
+components.HitscanWeapon = Jecs.tag() :: Id
+-- components.BeamWeapon = Jecs.tag() :: Id
+-- components.MeleeWeapon = Jecs.tag() :: Id
+
+components.Projectile = Jecs.tag() :: Id
+components.Gravity = world:component() :: Id<number>
+
+-- components.Explosive = Jecs.tag() :: Id
+-- components.Homing = Jecs.tag() :: Id
+-- components.Bouncing = Jecs.tag() :: Id
+-- components.Piercing = Jecs.tag() :: Id
+-- components.Ricochet = Jecs.tag() :: Id
+
+-- components.Burning = Jecs.tag() :: Id
+-- components.Poisoned = Jecs.tag() :: Id
+-- components.Frozen = Jecs.tag() :: Id
+-- components.Stunned = Jecs.tag() :: Id
+-- components.Bleeding = Jecs.tag() :: Id
+
+components.Bullet = Jecs.tag() :: Id
+-- components.Rocket = Jecs.tag() :: Id
+-- components.Laser = Jecs.tag() :: Id
+-- components.Magic = Jecs.tag() :: Id
+-- components.Plasma = Jecs.tag() :: Id
+
 local networked_components = {
 	"Name",
 	"Player",
@@ -171,16 +187,36 @@ local networked_components = {
 	"Rotation",
 	"Health",
 	"Stamina",
+	"Weapon",
+	"Ammo",
 	"Npc",
 	"Friendly",
 	"Neutral",
 	"Hostile",
+	"BulletData",
 }
 
 local networked_pairs = {
 	"Friendly",
 	"Neutral",
 	"Hostile",
+	"Projectile",
+	"Explosive",
+	"Homing",
+	"Bouncing",
+	"Piercing",
+	"Gravity",
+	"Ricochet",
+	"Burning",
+	"Poisoned",
+	"Frozen",
+	"Stunned",
+	"Bleeding",
+	"Bullet",
+	"Rocket",
+	"Laser",
+	"Magic",
+	"Plasma",
 }
 
 for name, component in components :: { [string]: Id } do
