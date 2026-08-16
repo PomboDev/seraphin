@@ -2,7 +2,8 @@
 
 GAME - https://www.roblox.com/games/135409043663974/Seraphin-INCOMPLETE
 
-Godot Version - https://villainesszzz.itch.io/seraphin
+Godot Version - https://github.com/PomboDev/seraphin-godot
+
 
 This was the second project for our second semester in my game design graduation. The theme for this semester was making a Doom-like clone. Even though Roblox has some limitations, for example, BillboardGui is not having a setting to make the Y-axis fixed.
 
